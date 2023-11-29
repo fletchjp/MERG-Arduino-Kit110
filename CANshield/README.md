@@ -27,7 +27,9 @@ The IDE will manage both the code and also several libraries which can be loaded
 All of the libraries needed for CANshield are available through the Library Manager which also prompts with updates for installed libraries.
 The user installs libraries into a fixed location which has all of the libraries which have been loaded, available for any sketch.
 
-Whenever a sketch is to be used
+Whenever a sketch is to be used the Arduino IDE calls a C++ compiler which compiles the code and a copy of each of the libraries needed. This can be done as a check that it allo works and then loaded onto the Arduino using the connection.
+
+On a Windows computer the USB connection to the computer will be via a COM port and it is necessary to tell the Arduino IDE which COM port to use.
 
 ## Using CANshield
 
