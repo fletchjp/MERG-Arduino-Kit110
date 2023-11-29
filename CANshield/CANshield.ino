@@ -10,7 +10,9 @@
 // The expected output has been documented. (DETAILS TO BE ADDED)
 // The module can then be connected to CBUS for further testing.
 ////////////////////////////////////////////////////////////////////////////////
-// Release 1b
+// Note that GitHub release numbers and FCU Version codes are different.
+// GitHub Release 1.0.0  FCU Version 1b first GitHub release
+// GitHub Release 1.1.0  FCU Version 1c add README file
 ////////////////////////////////////////////////////////////////////////////////
 
 /*
@@ -94,9 +96,9 @@
 
 // constants
 const byte VER_MAJ = 1;             // code major version
-const char VER_MIN = 'b';           // code minor version
+const char VER_MIN = 'c';           // code minor version
 const byte VER_BETA = 0;            // code beta sub-version
-const byte MODULE_ID = 81;          // CBUS module type (TO BE CHANGED WHEN NOTIFIED - CODE REQUESTED)
+const byte MODULE_ID = 81;          // CBUS module type CANshield
 
 const byte LED_GRN = 4;             // CBUS green SLiM LED pin
 const byte LED_YLW = 7;             // CBUS yellow FLiM LED pin
