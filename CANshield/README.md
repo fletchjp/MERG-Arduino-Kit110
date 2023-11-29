@@ -90,8 +90,7 @@ Bounce2    |*Debounce of switch inputs*
 ACAN2515   |*library to support the MCP2515/25625 CAN controller IC*
 CBUS2515   |*CAN controller and CBUS class*
 CBUSconfig |*module configuration*
-CBUS      |*CBUS Class*
-CBUSParams   |*Manage CBUS parameters*
+CBUS       |*CBUS Class*
 CBUSSwitch   |*Manage CBUS switch*
 CBUSLED      |*Manage CBUS indicator yellow/green LEDs*
 
