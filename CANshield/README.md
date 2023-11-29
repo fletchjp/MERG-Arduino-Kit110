@@ -3,6 +3,8 @@
 # CANshield
 
 An Arduino programm for the testing of the Arduino CAN Shield (MERG Kit Locker #110).
+Information about the kit can be found at https://www/merg.org.uk/merk_wiki/doku.php?id=kits:110
+
 The kit can be built either with an Arduino NANO mounted onto it , or as a shield to fit onto an Arduino UNO or MEGA.
 Note that for a MEGA some pin allocations are different.
 
@@ -21,9 +23,12 @@ The program is written in C++ but you do not need to understand this to use the 
 ## Loading the code and libraries
 
 In order to load the code it is necessary to load the Arduino IDE (Interactive Development Environment) onto a computer.
-There are currently two versions, the older 1.8.19 and the newer 2.2.1. Either will do for this.
+
+There are currently two IDE versions, the older 1.8.19 and the newer 2.2.1. Either will do for this.
 The IDE is available for different versions of Windows and also for other systems.
+
 The IDE will manage both the code and also several libraries which can be loaded using a Library Manager.
+
 All of the libraries needed for CANshield are available through the Library Manager which also prompts with updates for installed libraries.
 The user installs libraries into a fixed location which has all of the libraries which have been loaded, available for any sketch.
 
@@ -89,75 +94,6 @@ CBUS      |*CBUS Class*
 CBUSParams   |*Manage CBUS parameters*
 CBUSSwitch   |*Manage CBUS switch*
 CBUSLED      |*Manage CBUS indicator yellow/green LEDs*
-
-### Application Configuration
-
-The example is configured for use with the MERG Kit 110 CAN Shield. This has a crystal
-frequency of 16MHz.
-
-#### Consumed Events
-
-The 4 LEDs that are controlled by consumed events are connected to pins 3, 5, 6 & 9. These
-pins are ACTIVE LOW.  In other words, when ON, the pin will go low. The LED Cathode (in a 
-circuit diagram this is the point of the arrow with the bar across it) should be connected 
-to the pin and the ANode connected to +5V via a current limiting resistor.  Allowing for
-the forward voltage drop of the LED (roughly 2V depending upon colour), a 1K8 resistor will
-give an LED current of about 1.7mA which should suffice for most general purpose LEDs.
-
-#### Produced Events
-
-The 4 switches that produce events are connecte to pins A0, A1, A2 & A3. These inputs are
-active low.  An Internal pull-up resistor in the Arduino will hold these inputs at +5V. The
-switch should connect a pin to 0V and when closed it will initiate an event.
-
-### CBUS Op Codes
-
-The following Op codes are supported:
-
-OP_CODE | HEX | Function
-----------|---------|---------
- OPC_ACON | 0x90 | On event
- OPC_ACOF | 0x91 | Off event
- OPC_ASON | 0x98 | Short event on
- OPC_ASOF | 0x99 | Short event off
-
-### Event Variables
-
-Event Variables control the action to take when an event is received.
-The number of Event Variables (EV) is equal to the number of LEDs.
-
-Event Variable 1 (EV1) controls the first LED pin in the ```LED``` array. 
-EV2 controls the second LED pin, etc.
-
-The LEDs are controlled by the LEDControl class.  This allows for any LED to be
-switched on, switched off or flashed at a rate determined in the call:
-LEDControl::flash(unsigned int period)
-
-The following EV values are defined to control the LEDs:
-
- EV Value | Function
---------|-----------
- 0 | LED off
- 1 | LED on
- 2 | LED flash at 500mS
- 3 | LED flash at 250mS
- 
-### Node Variables
-
-Node Variables control the action to take when a switch is pressed or depressed.
-
-The number of Node Variables (NV) is equal to the number of switches.
-NV1 corresponds to the first pin defined in the array ```SWITCH```, 
-NV2 corresponds to the second pin in that array, etc.
-
-The following NV values define input switch function:
-
-NV Value | Function
---------|--------
- 0 | On/Off switch
- 1 | On only push button
- 2 | Off only push button
- 3 | On/Off toggle push button
 
 ## The Serial Monitor
 
