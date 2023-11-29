@@ -3,7 +3,7 @@
 # CANshield
 
 An Arduino programm for the testing of the Arduino CAN Shield (MERG Kit Locker #110).
-Information about the kit can be found at https://www/merg.org.uk/merk_wiki/doku.php?id=kits:110
+Information about the kit can be found at https://www.merg.org.uk/merg_wiki/doku.php?id=kits:110
 
 The kit can be built either with an Arduino NANO mounted onto it , or as a shield to fit onto an Arduino UNO or MEGA.
 Note that for a MEGA some pin allocations are different.
