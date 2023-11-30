@@ -20,6 +20,12 @@ Key Features:
 
 The program is written in C++ but you do not need to understand this to use the program.
 
+### Release history
+
+GitHub Release 1.0.0  FCU Version 1b first GitHub release
+GitHub Release 1.1.0  FCU Version 1c add README file
+GitHub Release 1.1.1  FCU Version 1d Edit of README file including release history.
+
 ## Loading the code and libraries
 
 In order to load the code it is necessary to load the Arduino IDE (Interactive Development Environment) onto a computer.
