@@ -13,6 +13,7 @@
 // Note that GitHub release numbers and FCU Version codes are different.
 // GitHub Release 1.0.0  FCU Version 1b first GitHub release
 // GitHub Release 1.1.0  FCU Version 1c add README file
+// GitHub Release 1.1.1  FCU Version 1d edit README file
 ////////////////////////////////////////////////////////////////////////////////
 
 /*
@@ -96,7 +97,7 @@
 
 // constants
 const byte VER_MAJ = 1;             // code major version
-const char VER_MIN = 'c';           // code minor version
+const char VER_MIN = 'd';           // code minor version
 const byte VER_BETA = 0;            // code beta sub-version
 const byte MODULE_ID = 81;          // CBUS module type CANshield
 
