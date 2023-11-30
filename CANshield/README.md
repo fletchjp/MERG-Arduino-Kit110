@@ -22,9 +22,9 @@ The program is written in C++ but you do not need to understand this to use the 
 
 ### Release history
 
-GitHub Release 1.0.0  FCU Version 1b first GitHub release
-GitHub Release 1.1.0  FCU Version 1c add README file
-GitHub Release 1.1.1  FCU Version 1d Edit of README file including release history.
+  * GitHub Release 1.0.0  FCU Version 1b first GitHub release
+  * GitHub Release 1.1.0  FCU Version 1c add README file
+  * GitHub Release 1.1.1  FCU Version 1d Edit of README file including release history.
 
 ## Loading the code and libraries
 
