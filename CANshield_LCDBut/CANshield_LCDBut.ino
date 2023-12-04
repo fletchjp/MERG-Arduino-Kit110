@@ -374,7 +374,6 @@ void setup() {
   taskManager.scheduleFixedRate(250, processSerialInput);
   taskManager.scheduleFixedRate(250, processButtons);
 
-  setupCBUS();
  // end of setup
   Serial << F("> ready") << endl << endl;
 
