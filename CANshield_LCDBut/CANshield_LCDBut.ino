@@ -5,6 +5,30 @@
 // LCDshieldButtonsSerialDFRobot.ino 
 // LCD shield with buttons example code
 // Adapted to run with CBUS
+
+///////////////////////////////////////////////////////////////////////////////////
+// Pin Use map UNO:
+// Digital pin 2          Interupt CAN
+// Digital pin 3 (PWM)    LED 0
+// Digital pin 4          LCD pin_d4
+// Digital pin 5 (PWM)    LCD pin_d5
+// Digital pin 6 (PWM)    LCD pin_d6
+// Digital pin 7          LCD pin_d7
+// Digital pin 8          LCD pin_RS
+// Digital pin 9 (PWM)    LCD pin_EN
+// Digital pin 10         LCD backlight pin
+// Digital pin 11 (MOSI)  SI    CAN
+// Digital pin 12 (MISO)  SO    CAN
+// Digital pin 13 (SCK)   Sck   CAN
+
+// Digital pin 14 / Analog pin 0  Analog input from buttons
+// Digital pin 15 / Analog pin 1 (SS)    CS    CAN    
+// Digital pin 16 / Analog pin 2     Switch 0
+// Digital pin 17 / Analog pin 3     Bell/buzzer use.
+// Digital / Analog pin 4     Not Used - reserved for I2C
+// Digital / Analog pin 5     Not Used - reserved for I2C
+//////////////////////////////////////////////////////////////////////////
+
 // 3rd party libraries
 #include <Streaming.h>
 #include <Bounce2.h>
