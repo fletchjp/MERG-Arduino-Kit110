@@ -29,6 +29,18 @@
 // Digital / Analog pin 5     Not Used - reserved for I2C
 //////////////////////////////////////////////////////////////////////////
 
+// IoAbstraction libraries
+#include <IoAbstraction.h>
+#include <DfRobotInputAbstraction.h>
+#include <TaskManagerIO.h>
+#include <DeviceEvents.h>
+
+/// This uses the default settings for analog ranges.
+IoAbstractionRef dfRobotKeys = inputFromDfRobotShield();
+
+/// It is in fact set as default defining dfRobotKeys.
+#define ANALOG_IN_PIN A0
+
 // 3rd party libraries
 #include <Streaming.h>
 #include <Bounce2.h>
@@ -265,6 +277,85 @@ void logKeyPressed(int pin,const char* whichKey, bool heldDown) {
 // Serial IO
 #define SERIAL_SPEED            115200   // Speed of the serial port.
 
+
+/**
+ * Along with using functions to receive callbacks when a button is pressed, we can
+ * also use a class that implements the SwitchListener interface. Here is an example
+ * of implementing that interface. You have both choices, function callback or
+ * interface implementation.
+ */
+class MyKeyListener : public SwitchListener {
+private:
+    const char* whatKey;
+public:
+    // This is the constructor where we configure our instance
+    MyKeyListener(const char* what) {
+        whatKey = what;
+    }
+
+    // when a key is pressed, this is called
+    void onPressed(pinid_t pin, bool held) override {
+        logKeyPressed(pin,whatKey, held);
+        button = pin;
+    }
+    
+    // when a key is released this is called.
+    void onReleased(pinid_t pin, bool held) override {
+        Serial.print("Release ");
+        logKeyPressed(pin,whatKey, held);
+    }
+};
+
+MyKeyListener selectKeyListener("SELECT");
+
+void runLEDs(){
+  // Run the LED code
+  for (int i = 0; i < NUM_LEDS; i++) {
+    moduleLED[i].run();
+  }
+}
+
+void setupModule()
+{
+   // configure the module switches, active low
+  for (int i = 0; i < NUM_SWITCHES; i++)
+  {
+    moduleSwitch[i].attach(SWITCH[i], INPUT_PULLUP);
+    moduleSwitch[i].interval(5);
+    switchState[i] = false;
+  }
+
+  // configure the module LEDs
+  for (int i = 0; i < NUM_LEDS; i++) {
+    moduleLED[i].setPin(LED[i]);
+  } 
+}
+
+void setup1602() {
+ lcd.begin(16, 2);
+ lcd.setCursor(0,0);
+ lcd.print("CANshield LCDBut");
+ lcd.setCursor(0,1);
+ lcd.print("Press Key:");
+}
+
+void setupSwitches()
+{
+    // initialise the switches component with the DfRobot shield as the input method.
+    // Note that switches is the sole instance of SwitchInput
+    switches.initialise(dfRobotKeys, false); // df robot is always false for 2nd parameter.
+
+    // now we add the switches, each one just logs the key press, the last parameter to addSwitch
+    // is the repeat frequency is optional, when not set it implies not repeating.
+    switches.addSwitch(DF_KEY_DOWN, [](pinid_t pin, bool held) { logKeyPressed(pin,"DOWN  ", held);}, 20);
+    switches.addSwitch(DF_KEY_UP, [](pinid_t pin, bool held) { logKeyPressed(pin,"UP    ", held);}, 20);
+    switches.addSwitch(DF_KEY_LEFT, [](pinid_t pin, bool held) { logKeyPressed(pin,"LEFT  ", held);}, 20);
+    switches.addSwitch(DF_KEY_RIGHT, [](pinid_t pin, bool held) { logKeyPressed(pin,"RIGHT ", held);}, 20);
+    //switches.onRelease(DF_KEY_RIGHT, [](pinid_t /*pin*/, bool) { Serial.println("RIGHT has been released");});
+    
+    switches.addSwitchListener(DF_KEY_SELECT, &selectKeyListener);
+}
+
 void setup() {
   // put your setup code here, to run once:
 
@@ -272,17 +363,23 @@ void setup() {
   Serial.begin(SERIAL_SPEED);             // Start Serial IO.
   Serial << endl << endl << F("> ** CBUS LCD Button Arduino Shield ** ") << __FILE__ << endl;
   //analogWrite(pin_d6,50);
- lcd.begin(16, 2);
- lcd.setCursor(0,0);
- lcd.print("CBUS LCDBut");
- lcd.setCursor(0,1);
- lcd.print("Press Key:");
+  setup1602();
+  setupCBUS();
+  setupModule();
+  setupSwitches();
+
+  // Schedule tasks to run every 250 milliseconds.
+  taskManager.scheduleFixedRate(250, runLEDs);
+  taskManager.scheduleFixedRate(250, processSwitches);
+  taskManager.scheduleFixedRate(250, processSerialInput);
+  taskManager.scheduleFixedRate(250, processButtons);
 
   setupCBUS();
  // end of setup
   Serial << F("> ready") << endl << endl;
 
 }
+
 
 void loop() {
   // put your main code here, to run repeatedly:
@@ -315,63 +412,10 @@ void loop() {
     // Serial << F("> error flag register is non-zero = ") << s << endl;
   }
 
+ // Run IO_Abstraction tasks.
+  // This replaces actions taken here in the previous version.
+  taskManager.runLoop();
 
- x = analogRead (0);
- if (x < 175){         // was 50
-  range = 1;
- } else if (x < 350){ // was 250
-  range = 2;
- } else if (x < 500){ // unchanged
-  range = 3;
- } else if (x < 800){ // was 650
-  range = 4;
- } else if (x < 850){ // unchanged
-  range = 5;
- } //else { range = 0; }
- if (range != prevrange) {
- Serial.print(range);
- Serial.print(" ");
- Serial.print(x);
- lcd.setCursor(10,1);
- switch (range) {
-  case 1:
-  {
-   lcd.print ("Right ");
-   //if (y == 0) {
-   Serial.println(" Right");
-     //y = 1;
-   //}
-   break;
-  }
-  case 2:
-  {
-   lcd.print ("Up    ");
-   Serial.println(" Up");
-   break;
-  }
-  case 3:
-  {
-   lcd.print ("Down  ");
-   Serial.println(" Down");
-   break;
-  }
-  case 4:
-  {
-   lcd.print ("Left  ");
-   Serial.println(" Left ");
-   break;
-  }
-  case 5:
-  {
-   lcd.print ("Select");
-   Serial.println(" Select");
-   break;
-  }
-  default:
-  break;
- }
- prevrange = range;
- }
 
 }
 
@@ -404,6 +448,111 @@ void printConfig(void) {
   Serial << F("> © Martin Da Costa (MERG M6223) 2023") << endl;
   Serial << F("> © John Fletcher (MERG M6777) 2023") << endl;
   return;
+}
+
+
+void processButtons(void)
+{
+   // Send an event corresponding to the button, add NUM_SWITCHES to avoid switch events.
+   byte opCode;
+   if (button != prevbutton) {
+      //DEBUG_PRINT(F("Button ") << button << F(" changed")); 
+      opCode = OPC_ACON;
+      sendEvent(opCode, button + NUM_SWITCHES);
+      prevbutton = button;
+   }
+}
+
+// Send an event routine according to Module Switch
+bool sendEvent(byte opCode, unsigned int eventNo)
+{
+  CANFrame msg;
+  msg.id = modconfig.CANID;
+  msg.len = 5;
+  msg.data[0] = opCode;
+  msg.data[1] = highByte(modconfig.nodeNum);
+  msg.data[2] = lowByte(modconfig.nodeNum);
+  msg.data[3] = highByte(eventNo);
+  msg.data[4] = lowByte(eventNo);
+
+  bool success = CBUS.sendMessage(&msg);
+  /*if (success) {
+    DEBUG_PRINT(F("> sent CBUS message with Event Number ") << eventNo);
+  } else {
+    DEBUG_PRINT(F("> error sending CBUS message"));
+  }*/
+  return success;
+}
+
+void processSwitches(void)
+{
+  bool is_success = true;
+  for (int i = 0; i < NUM_SWITCHES; i++)
+  {
+    moduleSwitch[i].update();
+    if (moduleSwitch[i].changed())
+    {
+     byte nv = i + 1;
+     byte nvval = modconfig.readNV(nv);
+
+     byte opCode;
+
+     //DEBUG_PRINT(F("> Button ") << i << F(" state change detected"));
+     Serial << F (" NV = ") << nv << F(" NV Value = ") << nvval;
+
+     switch (nvval)
+     {
+      case 0:
+        opCode = (moduleSwitch[i].fell() ? OPC_ACON : OPC_ACOF);
+  
+        //DEBUG_PRINT(F("> Button ") << i
+        //    << (moduleSwitch[i].fell() ? F(" pressed, send 0x") : F(" released, send 0x")) << _HEX(opCode));
+        is_success = sendEvent(opCode, (i + 1));
+        break;
+
+      case 1:
+          if (moduleSwitch[i].fell())
+          {
+            opCode = OPC_ACON;
+          //  DEBUG_PRINT(F("> Button ") << i << F(" pressed, send 0x") << _HEX(OPC_ACON));
+            is_success = sendEvent(opCode, (i + 1));
+          }
+          break;
+
+      case 2:
+
+
+          if (moduleSwitch[i].fell())
+          {
+            opCode = OPC_ACOF;
+            //DEBUG_PRINT(F("> Button ") << i << F(" pressed, send 0x") << _HEX(OPC_ACOF));
+            is_success = sendEvent(opCode, (i + 1));
+          }
+          break;
+
+      case 3:
+
+          if (moduleSwitch[i].fell())
+          {
+            switchState[i] = !switchState[i];
+            opCode = (switchState[i] ? OPC_ACON : OPC_ACOF);
+            //DEBUG_PRINT(F("> Button ") << i
+            //    << (moduleSwitch[i].fell() ? F(" pressed, send 0x") : F(" released, send 0x")) << _HEX(opCode));
+            is_success = sendEvent(opCode, (i + 1));
+          }
+
+        break;
+		
+		default:
+        //DEBUG_PRINT(F("> Invalid NV value."));
+        break;
+     }
+    }
+  } 
+  /*if (!is_success) 
+  {
+    DEBUG_PRINT(F("> One of the send message events failed"));
+  }*/
 }
 
 //
