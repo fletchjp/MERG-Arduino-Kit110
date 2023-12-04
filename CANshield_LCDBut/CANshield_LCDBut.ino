@@ -268,6 +268,11 @@ int y = 0;
 void logKeyPressed(int pin,const char* whichKey, bool heldDown) {
     Serial.print("Key ");
     Serial.print(whichKey);
+    lcd.begin(16, 2);
+    lcd.setCursor(0,0);
+    lcd.print("CANshield LCDBut");
+    lcd.setCursor(0,1);
+    lcd.print("Press Key:");
     lcd.setCursor(10,1);
     lcd.print (whichKey);
     Serial.println(heldDown ? " Held" : " Pressed");
