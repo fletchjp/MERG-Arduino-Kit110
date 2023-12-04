@@ -7,6 +7,7 @@
 // Adapted to run with CBUS
 // 3rd party libraries
 #include <Streaming.h>
+#include <Bounce2.h>
 
 ////////////////////////////////////////////////////////////////////////////
 // CBUS library header files
@@ -16,6 +17,9 @@
 #include <CBUSconfig.h>          // module configuration
 #include <cbusdefs.h>            // MERG CBUS constants
 #include <CBUSParams.h>          // CBUS parameters
+
+#include "LEDControl.h"          // CBUS LEDs
+
 
 ////////////DEFINE MODULE/////////////////////////////////////////////////
 /// Use these values for the CBUS outputs
@@ -36,6 +40,18 @@ const byte LED_YLW = 7;             // CBUS yellow FLiM LED pin
 const byte SWITCH0 = 8;             // CBUS push button switch pin
 
 const unsigned long CAN_OSC_FREQ = 16000000UL;     // Oscillator frequency on the CAN2515 board
+
+#define NUM_LEDS 1              // How many LEDs are there?
+#define NUM_SWITCHES 1          // How many switchs are there?
+
+///Module pins available for use are Pins 3 and A2 - A5
+const byte LED[NUM_LEDS] = {3};            // LED pin connections through typ. 1K8 resistor
+const byte SWITCH[NUM_SWITCHES] = {16};     // Module Switch takes input to 0V.
+
+/// module objects
+Bounce moduleSwitch[NUM_SWITCHES];  //  switch as input
+LEDControl moduleLED[NUM_LEDS];     //  LED as output
+byte switchState[NUM_SWITCHES];
 
 //////////////////////////////////////////////////////////////////////////
 
