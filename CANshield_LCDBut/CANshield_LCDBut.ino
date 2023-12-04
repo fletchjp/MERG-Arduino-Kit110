@@ -190,7 +190,7 @@ int prevrange = 0;
 int y = 0;
 
 // Serial IO
-#define SERIAL_SPEED            19200   // Speed of the serial port.
+#define SERIAL_SPEED            115200   // Speed of the serial port.
 
 void setup() {
   // put your setup code here, to run once:
