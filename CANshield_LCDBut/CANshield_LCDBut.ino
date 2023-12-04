@@ -44,7 +44,6 @@
 
 #include "LEDControl.h"          // CBUS LEDs
 
-
 ////////////DEFINE MODULE/////////////////////////////////////////////////
 /// Use these values for the CBUS outputs
 int button = -1;
@@ -93,6 +92,71 @@ CBUSSwitch pb_switch;               // switch object
 void eventhandler(byte, CANFrame *);
 void processSerialInput(void);
 void printConfig(void);
+
+
+// Index values for errors
+enum errorStates {
+  blankError,
+  noError,
+  emergencyStop,
+  CANbusError,
+  invalidError
+};
+
+// Index values for incoming event processing
+// enum base changed to avoid other events.
+// These are ideas at the moment.
+enum eventTypes {
+  nonEvent = 100,  // not used
+  testEvent,
+  emergencyEvent,
+  sendFailureEvent,
+  dataEvent,
+  requestEvent,
+  invalidEvent
+};
+
+// This is following the methods in EzyBus_master to provide error messages.
+// These have been limited to 16 chars to go on an LCD 2 by 16 display.
+// blank_string is used to cancel an error message.
+const char blank_string[]   PROGMEM  = "                ";
+const char error_string_0[] PROGMEM  = "no error";
+const char error_string_1[] PROGMEM  = "Test message";
+const char error_string_2[] PROGMEM  = "Emergency Stop";
+const char error_string_3[] PROGMEM  = "CANbus error";
+const char error_string_4[] PROGMEM  = "invalid error";
+
+const char* const error_string_table[] PROGMEM = {
+  blank_string, error_string_0, error_string_1, error_string_2, error_string_3, error_string_4
+};
+
+#define MAX_ERROR_NO 5
+
+// Buffer for string output.
+// This has been made safe for line termination.
+#define MAX_LENGTH_OF_STRING 16
+#define LENGTH_OF_BUFFER (MAX_LENGTH_OF_STRING + 1)
+char error_buffer[LENGTH_OF_BUFFER];
+
+// Add check for invalid error
+void getErrorMessage(int i)
+{
+  if (i >= 0 && i <= MAX_ERROR_NO) {
+     strncpy_P(error_buffer, (char*)pgm_read_word(&(error_string_table[i])),MAX_LENGTH_OF_STRING); 
+  } else {
+     strncpy_P(error_buffer, (char*)pgm_read_word(&(error_string_table[MAX_ERROR_NO])),MAX_LENGTH_OF_STRING); 
+  }
+}
+
+void serialPrintError(int i)
+{
+ getErrorMessage(i);Serial.print(error_buffer); 
+}
+void serialPrintErrorln(int i)
+{
+ getErrorMessage(i);Serial.println(error_buffer);
+}
+
 
 //
 /// setup CBUS - runs once at power on from setup()
@@ -188,6 +252,15 @@ int prevx = 0;
 int range;
 int prevrange = 0;
 int y = 0;
+
+void logKeyPressed(int pin,const char* whichKey, bool heldDown) {
+    Serial.print("Key ");
+    Serial.print(whichKey);
+    lcd.setCursor(10,1);
+    lcd.print (whichKey);
+    Serial.println(heldDown ? " Held" : " Pressed");
+    button = pin;
+}
 
 // Serial IO
 #define SERIAL_SPEED            115200   // Speed of the serial port.
