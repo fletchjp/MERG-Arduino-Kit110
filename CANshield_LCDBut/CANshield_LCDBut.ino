@@ -128,6 +128,36 @@ enum eventTypes {
   invalidEvent
 };
 
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+// LCD shield with buttons example code
+
+/*
+Arduino 2x16 LCD - Detect Buttons
+modified on 18 Feb 2019
+by Saeed Hosseini @ Electropeak
+https://electropeak.com/learn/
+Using data from here:
+https://wiki.dfrobot.com/Arduino_LCD_KeyPad_Shield__SKU__DFR0009_
+I have also played with the values.
+*/
+#include <LiquidCrystal.h>
+//LCD pin to Arduino
+const int pin_RS = 8; 
+const int pin_EN = 9; 
+const int pin_d4 = 4; 
+const int pin_d5 = 5; 
+const int pin_d6 = 6; 
+const int pin_d7 = 7; 
+const int pin_BL = 10; 
+LiquidCrystal lcd( pin_RS,  pin_EN,  pin_d4,  pin_d5,  pin_d6,  pin_d7);
+
+int x;
+int prevx = 0;
+int range;
+int prevrange = 0;
+int y = 0;
+
 // This is following the methods in EzyBus_master to provide error messages.
 // These have been limited to 16 chars to go on an LCD 2 by 16 display.
 // blank_string is used to cancel an error message.
@@ -149,6 +179,110 @@ const char* const error_string_table[] PROGMEM = {
 #define MAX_LENGTH_OF_STRING 16
 #define LENGTH_OF_BUFFER (MAX_LENGTH_OF_STRING + 1)
 char error_buffer[LENGTH_OF_BUFFER];
+
+void getErrorMessage(int i);
+
+// This is new in this version of the code and may be useful elsewhere.
+// It is used to transfer error details to the DrawingEvent
+// which is why it is declared here.
+struct Error
+{
+  int i;
+  byte x;
+  byte y;
+  Error() : i(0),x(0),y(0) {}
+  Error(int ii,byte xx,byte yy) : i(ii), x(xx), y(yy) { }
+  Error(const Error &e) : i(e.i), x(e.x), y(e.y) { }
+};
+
+/**
+ * Here we create an event that handles all the drawing for an application, in this case printing out readings
+ * of a sensor when changed. It uses polling and immediate triggering to show both examples
+ */
+class DrawingEvent : public BaseEvent {
+private:
+    volatile bool emergency; // if an event comes from an external interrupt the variable must be volatile.
+    bool hasChanged;
+    bool hasKey;
+    char key[7];
+    bool hasError;
+    Error error;
+public:
+    /** This constructor sets the initial values for various variables. */
+    DrawingEvent() {
+      hasChanged = false;
+      hasKey = false;
+      //key = "      ";
+      hasError = false;      
+    }
+    /**
+     * This is called by task manager every time the number of microseconds returned expires, if you trigger the
+     * event it will run the exec(), if you complete the event, it will be removed from task manager.
+     * @return the number of micros before calling again. 
+     */
+    uint32_t timeOfNextCheck() override {
+        setTriggered(hasChanged);
+        return millisToMicros(500); // no point refreshing more often on an LCD, as its unreadable
+    }
+
+    /**
+     * This is called when the event is triggered, it prints all the data onto the screen.
+     * Note that each source of input has its own bool variable.
+     * This ensures that only the items needing output are executed.
+     */
+    void exec() override {
+        hasChanged = false;
+
+        if (hasKey) {
+          hasKey = false;
+          // For some reason I have to redraw the whole display.
+          // If I do not then there is a corrupt output.
+          lcd.begin(16, 2);
+          lcd.setCursor(0,0);
+          lcd.print("CANshield LCDBut");
+          lcd.setCursor(0,1);
+          lcd.print("Press Key:");
+          lcd.setCursor(10,1);
+          lcd.print(key);
+        }
+        if (hasError) {
+            getErrorMessage(error.i);
+            lcd.setCursor(error.x, error.y);
+            lcd.write("E: ");
+            lcd.write(error_buffer);
+            hasError = false;
+        }
+    }
+
+    /* This provides for the logging of the key information
+       This is an example of something coming from an internal event. */
+    void drawKey(const char* whichKey) {
+        memcpy(key,whichKey,7); //= whichKey;
+        hasKey = true;
+        hasChanged = true;// we are happy to wait out the 500 millis
+    }
+    /* This provides for the logging of the error information.
+     * This is an example of something coming from an external event.
+     * The Error object holds the data for plotting. */
+    void displayError(const Error &e)
+    {
+        error = e;
+        hasError = true;
+        hasChanged = true;// we are happy to wait out the 500 millis
+    }
+    /**
+     * Triggers an emergency that requires immediate update of the screen
+     * @param isEmergency if there is an urgent notification
+     * This is not used at present and is included from the source example.
+     */
+    void triggerEmergency(bool isEmergency) {
+        emergency = isEmergency;
+        markTriggeredAndNotify(); // get on screen asap.
+    }
+};
+
+// create an instance of the above class
+DrawingEvent drawingEvent;
 
 // Add check for invalid error
 void getErrorMessage(int i)
@@ -235,46 +369,18 @@ void setupCBUS() {
   }
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////
-
-// LCD shield with buttons example code
-
-/*
-Arduino 2x16 LCD - Detect Buttons
-modified on 18 Feb 2019
-by Saeed Hosseini @ Electropeak
-https://electropeak.com/learn/
-Using data from here:
-https://wiki.dfrobot.com/Arduino_LCD_KeyPad_Shield__SKU__DFR0009_
-I have also played with the values.
-*/
-#include <LiquidCrystal.h>
-//LCD pin to Arduino
-const int pin_RS = 8; 
-const int pin_EN = 9; 
-const int pin_d4 = 4; 
-const int pin_d5 = 5; 
-const int pin_d6 = 6; 
-const int pin_d7 = 7; 
-const int pin_BL = 10; 
-LiquidCrystal lcd( pin_RS,  pin_EN,  pin_d4,  pin_d5,  pin_d6,  pin_d7);
-
-int x;
-int prevx = 0;
-int range;
-int prevrange = 0;
-int y = 0;
 
 void logKeyPressed(int pin,const char* whichKey, bool heldDown) {
+    drawingEvent.drawKey(whichKey);
     Serial.print("Key ");
     Serial.print(whichKey);
-    lcd.begin(16, 2);
-    lcd.setCursor(0,0);
-    lcd.print("CANshield LCDBut");
-    lcd.setCursor(0,1);
-    lcd.print("Press Key:");
-    lcd.setCursor(10,1);
-    lcd.print (whichKey);
+    //lcd.begin(16, 2);
+    //lcd.setCursor(0,0);
+    //lcd.print("CANshield LCDBut");
+    //lcd.setCursor(0,1);
+    //lcd.print("Press Key:");
+    //lcd.setCursor(10,1);
+    //lcd.print (whichKey);
     Serial.println(heldDown ? " Held" : " Pressed");
     button = pin;
 }
@@ -378,6 +484,10 @@ void setup() {
   taskManager.scheduleFixedRate(250, processSwitches);
   taskManager.scheduleFixedRate(250, processSerialInput);
   taskManager.scheduleFixedRate(250, processButtons);
+
+  // create any other tasks that you need here for your sketch
+
+  taskManager.registerEvent(&drawingEvent);
 
  // end of setup
   Serial << F("> ready") << endl << endl;
