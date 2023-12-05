@@ -34,6 +34,8 @@
 #include <DfRobotInputAbstraction.h>
 #include <TaskManagerIO.h>
 #include <DeviceEvents.h>
+// Note that this header defines LiquidCrystal.h so making sure that LiquidCrystal.h is not read as well.
+#include <LiquidCrystalIO.h> 
 
 /// This uses the default settings for analog ranges.
 IoAbstractionRef dfRobotKeys = inputFromDfRobotShield();
@@ -141,7 +143,7 @@ Using data from here:
 https://wiki.dfrobot.com/Arduino_LCD_KeyPad_Shield__SKU__DFR0009_
 I have also played with the values.
 */
-#include <LiquidCrystal.h>
+//#include <LiquidCrystal.h>
 //LCD pin to Arduino
 const int pin_RS = 8; 
 const int pin_EN = 9; 
@@ -237,11 +239,15 @@ public:
           hasKey = false;
           // For some reason I have to redraw the whole display.
           // If I do not then there is a corrupt output.
+          // It also seems as though setting the cursor
+          // is relative to the last position, which is not what I thought
+          // happened before. This works, redrawing the whole display.
           lcd.begin(16, 2);
           lcd.setCursor(0,0);
           lcd.print("CANshield LCDBut");
           lcd.setCursor(0,1);
           lcd.print("Press Key:");
+          //lcd.home();
           lcd.setCursor(10,1);
           lcd.print(key);
         }
@@ -340,7 +346,7 @@ void setupCBUS() {
   // set CBUS LED pins and assign to CBUS
   ledGrn.setPin(LED_GRN);
   ledYlw.setPin(LED_YLW);
-  CBUS.setLEDs(ledGrn, ledYlw);
+  CBUS.setLEDs(ledGrn, ledYlw); 
 
   // initialise CBUS switch and assign to CBUS
   pb_switch.setPin(SWITCH0, LOW);
