@@ -89,7 +89,7 @@
 
 // CBUS library header files
 #include <CBUS2515.h>               // CAN controller and CBUS class
-#include <CBUSSwitch.h>             // pushbutton switch
+#include <CBUSswitch.h>             // pushbutton switch
 #include <CBUSLED.h>                // CBUS LEDs
 #include <CBUSconfig.h>             // module configuration
 #include <CBUSParams.h>             // CBUS parameters
