@@ -1,25 +1,34 @@
 
 /////////////////////////////////////////////////////////////////////////////////
-// CANshield
+// CANshield Version 2a This will detect which board is in use and act as appropriate.
+/////////////////////////////////////////////////////////////////////////////////
 // This code is intended for the testing of the Arduino CAN shield (MERG Kit 110).
-// The shield plugs into a UNO or MEGA (or clone) and has a NANO plugged in if assembled for that option.
-// This code should be installed on the Arduino when the shield has been assembled.
+// The shield plugs into a UNO or MEGA (or clone) OR has a NANO plugged in if assembled for that option.
+// This code should be installed on the Arduino when the Kit 110 has been assembled and installed.
 // The user needs to have a computer with a copy of the Arduino IDE installed (either version 1.8 or 2.x will do).
-// There is a need for USB lead to connect to the Arduino. This needs to match the socket on the Arduino.
+// There is a need for USB lead to connect to the Arduino.
+// This needs to match the socket on the Arduino. The sockets vary between boards and manufacturer.
 // This code can then be compiled and run without a connection to CBUS. 
-// The expected output has been documented. (DETAILS TO BE ADDED)
+// The expected output has been documented.
 // The module can then be connected to CBUS for further testing.
 ////////////////////////////////////////////////////////////////////////////////
 // Note that GitHub release numbers and FCU Version codes are different.
 // GitHub Release 1.0.0  FCU Version 1b first GitHub release
 // GitHub Release 1.1.0  FCU Version 1c add README file
 // GitHub Release 1.1.1  FCU Version 1d edit README file
+// GitHub Release 1.2.0  FCU Version 2a Detect which board is in use and act as appropriate.
+////////////////////////////////////////////////////////////////////////////////
+// BOARDS supported are the same as for Kit 110
+// Arduino NANO
+// Arduino UNO
+// Arduino MEGA 2560
+// Arduino MEGA 1280 support is included as there are some available. To be checked.
 ////////////////////////////////////////////////////////////////////////////////
 
 /*
   Copyright (C) Duncan Greenwood 2017 (duncan_greenwood@hotmail.com) 
             (C) Martin Da Costa  2023 (martin_dacosta@ntlworld.com)
-            (C) John Fletcher    2023 (john@bunbury28.plus.com)
+            (C) John Fletcher    2024 (john@bunbury28.plus.com)
 
   This work is licensed under the:
       Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
@@ -53,14 +62,9 @@
 
 */
 
-/*
-      3rd party libraries needed for compilation: (not for binary-only distributions)
-
-      Streaming   -- C++ stream style output, v5, (http://arduiniana.org/libraries/streaming/)
-      ACAN2515    -- library to support the MCP2515/25625 CAN controller IC
-*/
-
-///////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+// Pin Use maps. Pins marked Not Used can be use for other needs of the application.
+////////////////////////////////////////////////////////////////////////////////////
 // Pin Use map for UNO and NANO:
 // Digital pin 2          Interupt CAN
 // Digital pin 3 (PWM)    Not Used
@@ -70,7 +74,7 @@
 // Digital pin 7          CBUS Yellow LED
 // Digital pin 8          CBUS Switch
 // Digital pin 9 (PWM)    Not Used
-// Digital pin 10 (SS)    CS    CAN
+// Digital pin 10 (SS)    CS    CAN 
 // Digital pin 11 (MOSI)  SI    CAN
 // Digital pin 12 (MISO)  SO    CAN
 // Digital pin 13 (SCK)   Sck   CAN
@@ -84,6 +88,39 @@
 // Digital / Analog pin 5     Not Used
 //////////////////////////////////////////////////////////////////////////
 
+//////////////////////////////////////////////////////////////////////////
+// Pin Use map on a MEGA 1280 and MEGA 2560
+// Digital pin 2          Not Used
+// Digital pin 3 (PWM)    Not Used
+// Digital pin 4          CBUS Green LED
+// Digital pin 5 (PWM)    Not Used
+// Digital pin 6 (PWM)    Not Used
+// Digital pin 7          CBUS Yellow LED
+// Digital pin 8          CBUS Switch
+// Digital pin 9 (PWM)    Not Used
+// Digital pin 10 (SS)    CS    CAN
+
+// Digital pin 19         Interrupt CAN   Note: this involved use of a wire to connect it.
+
+// SPI pins on a MEGA 2560. No wires are connected to the sockets.
+// Digital pin 50 (MOSI)  SI    CAN  Do not use for something else
+// Digital pin 51 (MISO)  SO    CAN  Do not use for something else
+// Digital pin 52 (SCK)   SCK   CAN  Do not use for something else
+//////////////////////////////////////////////////////////////////////////
+
+// Define for either 1280 or 2560 MEGA
+#if (defined ARDUINO_AVR_MEGA2560) || (defined ARDUINO_ARDUINO_AVR_MEGA)
+#define ARDUINO_MEGA
+#endif
+
+/*
+      3rd party libraries needed for compilation:
+
+      Streaming   -- C++ stream style output, v5, (http://arduiniana.org/libraries/streaming/)
+      ACAN2515    -- library to support the MCP2515/25625 CAN controller IC
+*/
+
+//////////////////////////////////////////////////////////////////////////
 // 3rd party libraries
 #include <Streaming.h>
 
@@ -96,8 +133,8 @@
 #include <cbusdefs.h>               // MERG CBUS constants
 
 // constants
-const byte VER_MAJ = 1;             // code major version
-const char VER_MIN = 'd';           // code minor version
+const byte VER_MAJ = 2;             // code major version
+const char VER_MIN = 'a';           // code minor version
 const byte VER_BETA = 0;            // code beta sub-version
 const byte MODULE_ID = 81;          // CBUS module type CANshield
 
@@ -111,7 +148,12 @@ const unsigned long CAN_OSC_FREQ = 16000000UL;  // Oscillator frequency on the C
 //////////////////////////////////////////////////////////////////////////
 
 //CBUS pins
-const byte CAN_INT_PIN = 2;
+#ifdef ARDUINO_MEGA
+const byte CAN_INT_PIN = 19; //Changed for a MEGA2560 or MEGA 1280
+#else
+const byte CAN_INT_PIN = 2;  //Value for UNO or NANO.
+#endif
+// This can be changed if other hardware uses pin 10.
 const byte CAN_CS_PIN = 10;
 
 // CBUS objects
@@ -276,7 +318,19 @@ void printConfig(void) {
   // code version
   Serial << F("> code version = ") << VER_MAJ << VER_MIN << F(" beta ") << VER_BETA << endl;
   Serial << F("> compiled on ") << __DATE__ << F(" at ") << __TIME__ << F(", compiler ver = ") << __cplusplus << endl;
-
+#ifdef MEGA
+#ifdef ARDUINO_AVR_MEGA2560
+  Serial << F("> Running on an Arduino MEGA2560") << endl;
+#else
+  Serial << F("> Running on an Arduino MEGA1280") << endl;
+#endif
+#elif defined(ARDUINO_AVR_NANO)
+  Serial << F("> Running on an Arduino NANO") << endl;
+#elif defined(ARDUINO_AVR_UNO)
+  Serial << F("> Running on an Arduino UNO") << endl;
+#else
+  Serial << F("> Running on something else") << endl;
+#endif
   // copyright
   Serial << F("> © Duncan Greenwood (MERG M5767) 2019") << endl;
   Serial << F("> © Martin Da Costa (MERG M6223) 2023") << endl;
