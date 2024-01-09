@@ -9,7 +9,7 @@
  
  This is an Arduino code to run to test the working of the Kit 110 shield once it has been built and connected to an Arduino UNO or NANO or MEGA, depending on the build choice.
  
- This code now detects the device in use and adjusts one of the pin choices by the code.
+ This code now detects the device in use and adjusts one of the pin choices in the code.
  
  Further information will be found in a README file included with the CANshield example.
  
