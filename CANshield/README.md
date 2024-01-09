@@ -5,11 +5,13 @@
 An Arduino programm for the testing of the Arduino CAN Shield (MERG Kit Locker #110).
 Information about the kit can be found at https://www.merg.org.uk/merg_wiki/doku.php?id=kits:110
 
-The kit can be built either with an Arduino NANO mounted onto it , or as a shield to fit onto an Arduino UNO or MEGA.
-Note that for a MEGA some pin allocations are different.
+The kit can be built either with an Arduino NANO mounted onto it , or as a shield to fit onto an Arduino UNO or MEGA 1280 or MEGA 2560.
+Note that for a MEGA types some pin allocations are different. 
 
 This sketch provides the code which will enable users of the Arduino CAN Shield to test functionality of the shield.
 Sketch is the Arduino name for the program code which is run on an Arduino.
+
+This code detects the presence of a MEGA and adjusts the setting for one of the pins.
 
 Key Features:
 - MERG CBUS interface.
@@ -25,6 +27,7 @@ The program is written in C++ but you do not need to understand this to use the 
   * GitHub Release 1.0.0  FCU Version 1b first GitHub release
   * GitHub Release 1.1.0  FCU Version 1c add README file
   * GitHub Release 1.1.1  FCU Version 1d Edit of README file including release history.
+  * GitHub Release 1.2.0  FCU Version 2a Detect which board is in use and act as appropriate.
 
 ## Loading the code and libraries
 
@@ -56,7 +59,7 @@ jumper, another pin can be wire linked for this function.
 If you change the interrupt or chip select pins, make sure that you update the relevant pin 
 allocations in the sketch.
 
-If the MERG Kit 110 CAN Shield is used, the following pins are connected by default:
+If the MERG Kit 110 CAN Shield is used, the following pins are connected by default for a UNO or NANO:
 
 Pin | Description
 --- | ---
@@ -65,6 +68,17 @@ Digital pin 10| (SS)    CS    CAN
 Digital pin 11| (MOSI)  SI    CAN
 Digital pin 12| (MISO)  SO    CAN
 Digital pin 13| (SCK)   Sck   CAN
+
+The following pins are connected by default for MEGA 1280 or 2560:
+
+Pin | Description
+--- | ---
+Digital pin 19| Interupt CAN    Note that a wire connection is needed for this pin.
+Digital pin 10| (SS)    CS    CAN
+Digital pin 50| (MOSI)  SI    CAN
+Digital pin 51| (MISO)  SO    CAN
+Digital pin 52| (SCK)   Sck   CAN
+
 
 Using the CAN Shield, the following pins are used for CBUS Initialisation:
 
@@ -92,7 +106,6 @@ The following third party libraries are required:
 Library | Purpose
 ---------------|-----------------
 Streaming  |*C++ stream style output, v5, (http://arduiniana.org/libraries/streaming/)*
-Bounce2    |*Debounce of switch inputs*
 ACAN2515   |*library to support the MCP2515/25625 CAN controller IC*
 CBUS2515   |*CAN controller and CBUS class*
 CBUSconfig |*module configuration*
