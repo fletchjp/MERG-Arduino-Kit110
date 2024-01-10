@@ -109,7 +109,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 // Define for either 1280 or 2560 MEGA
-#if (defined ARDUINO_AVR_MEGA2560) || (defined ARDUINO_ARDUINO_AVR_MEGA)
+#if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_ARDUINO_AVR_MEGA)
 #define ARDUINO_MEGA
 #endif
 
@@ -318,7 +318,7 @@ void printConfig(void) {
   // code version
   Serial << F("> code version = ") << VER_MAJ << VER_MIN << F(" beta ") << VER_BETA << endl;
   Serial << F("> compiled on ") << __DATE__ << F(" at ") << __TIME__ << F(", compiler ver = ") << __cplusplus << endl;
-#ifdef MEGA
+#ifdef ARDUINO_MEGA
 #ifdef ARDUINO_AVR_MEGA2560
   Serial << F("> Running on an Arduino MEGA2560") << endl;
 #else
@@ -334,7 +334,7 @@ void printConfig(void) {
   // copyright
   Serial << F("> © Duncan Greenwood (MERG M5767) 2019") << endl;
   Serial << F("> © Martin Da Costa (MERG M6223) 2023") << endl;
-  Serial << F("> © John Fletcher (MERG M6777) 2023") << endl;
+  Serial << F("> © John Fletcher (MERG M6777) 2024") << endl;
   return;
 }
 
