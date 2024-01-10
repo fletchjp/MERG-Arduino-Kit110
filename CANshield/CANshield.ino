@@ -109,7 +109,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 // Define for either 1280 or 2560 MEGA
-#if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_ARDUINO_AVR_MEGA)
+#if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_MEGA)
 #define ARDUINO_MEGA
 #endif
 
@@ -148,7 +148,7 @@ const unsigned long CAN_OSC_FREQ = 16000000UL;  // Oscillator frequency on the C
 //////////////////////////////////////////////////////////////////////////
 
 //CBUS pins
-#ifdef ARDUINO_MEGA
+#ifdef ARDUINO_AVR_MEGA2560 //ARDUINO_MEGA
 const byte CAN_INT_PIN = 19; //Changed for a MEGA2560 or MEGA 1280
 #else
 const byte CAN_INT_PIN = 2;  //Value for UNO or NANO.
