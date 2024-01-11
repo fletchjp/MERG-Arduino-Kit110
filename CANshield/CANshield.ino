@@ -1,6 +1,6 @@
 
 /////////////////////////////////////////////////////////////////////////////////
-// CANshield Version 2a This will detect which board is in use and act as appropriate.
+// CANshield Version 2c This will detect which board is in use and report.
 /////////////////////////////////////////////////////////////////////////////////
 // This code is intended for the testing of the Arduino CAN shield (MERG Kit 110).
 // The shield plugs into a UNO or MEGA (or clone) OR has a NANO plugged in if assembled for that option.
