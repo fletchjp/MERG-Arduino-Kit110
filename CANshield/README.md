@@ -11,7 +11,7 @@ Note that for a MEGA types some pin allocations are different.
 This sketch provides the code which will enable users of the Arduino CAN Shield to test functionality of the shield.
 Sketch is the Arduino name for the program code which is run on an Arduino.
 
-This code detects the presence of a MEGA and adjusts the setting for one of the pins.
+This code detects the presence the board in use and gives an message of the type detected.
 
 Key Features:
 - MERG CBUS interface.
@@ -28,6 +28,7 @@ The program is written in C++ but you do not need to understand this to use the 
   * GitHub Release 1.1.0  FCU Version 1c add README file
   * GitHub Release 1.1.1  FCU Version 1d Edit of README file including release history.
   * GitHub Release 1.2.0  FCU Version 2a Detect which board is in use and act as appropriate.
+  * GitHub Release 1.2.1  FCU Version 2b Detect which board is in use and use the same interrupt pin.
 
 ## Loading the code and libraries
 
@@ -73,12 +74,13 @@ The following pins are connected by default for MEGA 1280 or 2560:
 
 Pin | Description
 --- | ---
-Digital pin 19| Interupt CAN    Note that a wire connection is needed for this pin.
+Digital pin 2 | Interupt CAN
 Digital pin 10| (SS)    CS    CAN
 Digital pin 50| (MOSI)  SI    CAN
 Digital pin 51| (MISO)  SO    CAN
 Digital pin 52| (SCK)   Sck   CAN
 
+There is no need to connect wires to pins 50, 51 and 52. Do not use them for anything else.
 
 Using the CAN Shield, the following pins are used for CBUS Initialisation:
 
