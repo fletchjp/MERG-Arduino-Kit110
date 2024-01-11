@@ -17,12 +17,13 @@
 // GitHub Release 1.1.0  FCU Version 1c add README file
 // GitHub Release 1.1.1  FCU Version 1d edit README file
 // GitHub Release 1.2.0  FCU Version 2a Detect which board is in use and act as appropriate.
+// GitHub Release 1.2.1  FCU Version 2b Detect which board is in use and use the same interrupt pin.
 ////////////////////////////////////////////////////////////////////////////////
 // BOARDS supported are the same as for Kit 110
 // Arduino NANO
 // Arduino UNO
+// Arduino MEGA 1280
 // Arduino MEGA 2560
-// Arduino MEGA 1280 support is included as there are some available. To be checked.
 ////////////////////////////////////////////////////////////////////////////////
 
 /*
@@ -90,7 +91,7 @@
 
 //////////////////////////////////////////////////////////////////////////
 // Pin Use map on a MEGA 1280 and MEGA 2560
-// Digital pin 2          Not Used
+// Digital pin 2          Interrupt CAN
 // Digital pin 3 (PWM)    Not Used
 // Digital pin 4          CBUS Green LED
 // Digital pin 5 (PWM)    Not Used
@@ -100,9 +101,7 @@
 // Digital pin 9 (PWM)    Not Used
 // Digital pin 10 (SS)    CS    CAN
 
-// Digital pin 19         Interrupt CAN   Note: this involved use of a wire to connect it.
-
-// SPI pins on a MEGA 2560. No wires are connected to the sockets.
+// SPI pins on a MEGA 1280 or MEGA 2560. No wires are connected to the sockets.
 // Digital pin 50 (MOSI)  SI    CAN  Do not use for something else
 // Digital pin 51 (MISO)  SO    CAN  Do not use for something else
 // Digital pin 52 (SCK)   SCK   CAN  Do not use for something else
@@ -134,7 +133,7 @@
 
 // constants
 const byte VER_MAJ = 2;             // code major version
-const char VER_MIN = 'a';           // code minor version
+const char VER_MIN = 'b';           // code minor version
 const byte VER_BETA = 0;            // code beta sub-version
 const byte MODULE_ID = 81;          // CBUS module type CANshield
 
@@ -148,11 +147,8 @@ const unsigned long CAN_OSC_FREQ = 16000000UL;  // Oscillator frequency on the C
 //////////////////////////////////////////////////////////////////////////
 
 //CBUS pins
-#ifdef ARDUINO_AVR_MEGA2560 //ARDUINO_MEGA
-const byte CAN_INT_PIN = 19; //Changed for a MEGA2560 or MEGA 1280
-#else
-const byte CAN_INT_PIN = 2;  //Value for UNO or NANO.
-#endif
+// For a MEGA 1280 or MEGA 2560 this can be changed if there is another need for pin 2.
+const byte CAN_INT_PIN = 2;
 // This can be changed if other hardware uses pin 10.
 const byte CAN_CS_PIN = 10;
 
