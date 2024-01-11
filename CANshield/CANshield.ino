@@ -331,6 +331,7 @@ void printConfig(void) {
 #else
   Serial << F("> Running on something else") << endl;
 #endif
+  Serial << F("> Using Interrupt Pin ") << CAN_INT_PIN << endl;
   // copyright
   Serial << F("> © Duncan Greenwood (MERG M5767) 2019") << endl;
   Serial << F("> © Martin Da Costa (MERG M6223) 2023") << endl;
