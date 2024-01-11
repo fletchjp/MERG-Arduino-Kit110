@@ -5,7 +5,7 @@
  
  The user will also need to have a CBUS network.
  
-## CANshield Release 1.2.1 FCU Version 2b
+## CANshield Release 1.2.2 FCU Version 2c
  
  This is an Arduino code to run to test the working of the Kit 110 shield once it has been built and connected to an Arduino UNO or NANO or MEGA, depending on the build choice.
  

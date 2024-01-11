@@ -18,6 +18,7 @@
 // GitHub Release 1.1.1  FCU Version 1d edit README file
 // GitHub Release 1.2.0  FCU Version 2a Detect which board is in use and act as appropriate.
 // GitHub Release 1.2.1  FCU Version 2b Detect which board is in use and use the same interrupt pin.
+// GitHub Release 1.2.2  FCU Version 2c Minor correction to README file.
 ////////////////////////////////////////////////////////////////////////////////
 // BOARDS supported are the same as for Kit 110
 // Arduino NANO
@@ -133,7 +134,7 @@
 
 // constants
 const byte VER_MAJ = 2;             // code major version
-const char VER_MIN = 'b';           // code minor version
+const char VER_MIN = 'c';           // code minor version
 const byte VER_BETA = 0;            // code beta sub-version
 const byte MODULE_ID = 81;          // CBUS module type CANshield
 

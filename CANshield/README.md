@@ -6,7 +6,6 @@ An Arduino programm for the testing of the Arduino CAN Shield (MERG Kit Locker #
 Information about the kit can be found at https://www.merg.org.uk/merg_wiki/doku.php?id=kits:110
 
 The kit can be built either with an Arduino NANO mounted onto it , or as a shield to fit onto an Arduino UNO or MEGA 1280 or MEGA 2560.
-Note that for a MEGA types some pin allocations are different. 
 
 This sketch provides the code which will enable users of the Arduino CAN Shield to test functionality of the shield.
 Sketch is the Arduino name for the program code which is run on an Arduino.
@@ -29,6 +28,7 @@ The program is written in C++ but you do not need to understand this to use the 
   * GitHub Release 1.1.1  FCU Version 1d Edit of README file including release history.
   * GitHub Release 1.2.0  FCU Version 2a Detect which board is in use and act as appropriate.
   * GitHub Release 1.2.1  FCU Version 2b Detect which board is in use and use the same interrupt pin.
+  * GitHub Release 1.2.2  FCU Version 2c Minor correction to this README file.
 
 ## Loading the code and libraries
 
